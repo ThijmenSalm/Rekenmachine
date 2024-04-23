@@ -8,7 +8,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import static javafx.scene.input.KeyEvent.KEY_PRESSED;
@@ -30,15 +29,18 @@ public class JavaFXApp extends Application {
     }
 
     protected int computeAdd (int number1, int number2) {
-        return 0;
+        IComputation computation = new AddComputation();
+        return computation.compute(number1, number2);
     }
 
-    protected int computeMultiply (int number1, int number2) {
-        return 0;
+    protected int computeMultiply(int number1, int number2) {
+        IComputation computation = new MultiplyComputation();
+        return computation.compute(number1, number2);
     }
 
-    protected int computeDivide (int number1, int number2) {
-        return 0;
+    protected int computeDivide(int number1, int number2) {
+        IComputation computation = new DivideComputation();
+        return computation.compute(number1, number2);
     }
 
     private void compute (String operator) {
@@ -46,6 +48,8 @@ public class JavaFXApp extends Application {
         int result;
         int number1 = getNumberFromTextField (txtNumber1);
         int number2 = getNumberFromTextField (txtNumber2);
+
+        IComputation computation = getComputation(operator);
 
         switch (operator) {
             case PLUS:
@@ -60,7 +64,7 @@ public class JavaFXApp extends Application {
             default:
                 result = 0;
         }
-
+        result = computation.compute(number1, number2);
         txtResult.setText (String.valueOf (result));
     }
 
@@ -155,6 +159,45 @@ public class JavaFXApp extends Application {
         primaryStage.setScene(startScene);
         primaryStage.setTitle("OPT3 - Rekenmachine");
         primaryStage.show();
+    }
+    public interface IComputation {
+         int compute (int number1, int number2);
+
+    }
+    public class AddComputation implements IComputation{
+        @Override
+        public int compute(int number1, int number2) {
+            return number1 + number2;
+        }
+    }
+    public class MultiplyComputation implements IComputation {
+        @Override
+        public int compute(int number1, int number2) {
+            return number1 * number2;
+        }
+    }
+    public class DivideComputation implements IComputation {
+        @Override
+        public int compute(int number1, int number2) {
+            if (number2 == 0) {
+                throw new ArithmeticException("Cannot divide by zero");
+            }
+            return number1 / number2;
+        }
+    }
+
+    private IComputation getComputation(String operator) {
+        switch (operator) {
+            case PLUS:
+                    return new AddComputation();
+            case MULTIPLY:
+                    return new MultiplyComputation();
+            case DIVIDE:
+                    return new DivideComputation();
+            default:
+                throw new IllegalArgumentException("Unknown operator: " +  operator);
+
+        }
     }
 
     public static void main(String[] args) {
